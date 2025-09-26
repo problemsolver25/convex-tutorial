@@ -20,6 +20,6 @@
     "isolatedModules": true,
     "noEmit": true
   },
-  "include": ["./**/*"],
+  "include": ["./**/*", "../Refactor/schema.js"],
   "exclude": ["./_generated"]
 }
