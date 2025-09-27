@@ -2,6 +2,11 @@ import { query, mutation, internalAction } from "./_generated/server";
 import { v } from "convex/values";
 import { api, internal } from "./_generated/api";
 
+// Convex backend logic = TypeScript functions.
+
+// Mutation: Write to the database.
+// Update the database.
+// Always run as transactions (all or nothing).
 export const sendMessage = mutation({
   args: {
     user: v.string(),
@@ -27,6 +32,8 @@ export const sendMessage = mutation({
   },
 });
 
+// Query: Read from the database.
+// Queries are not transactional, and can be cached.
 export const getMessages = query({
   args: {},
   handler: async (ctx) => {
@@ -37,6 +44,20 @@ export const getMessages = query({
   },
 });
 
+// # Sync Engine:
+// - Combines queries, mutations, and the database.
+// - Works via WebSockets for fast real-time updates.
+// - When data changes, Convex reruns queries automatically and pushes updates to all clients.
+
+
+// # Why Actions Exist
+
+// Mutations & queries cannot call external APIs because Convex enforces:
+// - Strong transactions (all-or-nothing).
+// - Deterministic sync engine (predictable reactivity).
+// - Real apps need external calls → Convex provides actions for that.
+
+// /wiki <topic> command handler
 export const getWikipediaSummary = internalAction({
   args: { topic: v.string() },
   handler: async (ctx, args) => {
@@ -44,8 +65,6 @@ export const getWikipediaSummary = internalAction({
       "https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&titles=" +
         args.topic,
     );
-
-    //return getSummaryFromJSON(await response.json());
 
     // Replace the `return ...` with the following.
     const summary = getSummaryFromJSON(await response.json());
